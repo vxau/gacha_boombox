@@ -9,6 +9,7 @@ Config.KeyDeleteSpeaker = 194
 Config.KeyToMove = 311
 Config.KeyToPlaceSpeaker = 191
 Config.KeyToChangeAnim = 311
+Config.AllowedJobs = { police = { minGrade = 4 }, ambulance = { minGrade = 4 } }
 
 Config.Translations = {
     notEnoughDistance= '近くのスピーカーともう少し距離を置いてください。',
@@ -23,5 +24,6 @@ Config.Translations = {
     unkown= '不明',
     titleFirstMessage= 'まだプレイリストがありませんか？',
     secondFirstMessage= 'プレイリストを作成',
-    holdingBoombox= 'スピーカーを設置するには ~INPUT_FRONTEND_RDOWN~ を押し、アニメーションを変更するには ~INPUT_REPLAY_SHOWHOTKEY~ を押してください。'
+    holdingBoombox= 'スピーカーを設置するには ~INPUT_FRONTEND_RDOWN~ を押し、アニメーションを変更するには ~INPUT_REPLAY_SHOWHOTKEY~ を押してください。',
+    notAllowed= 'この操作を行う権限がありません。'
 }

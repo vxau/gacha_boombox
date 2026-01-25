@@ -1,6 +1,14 @@
 Speakers = {}
 local objects = {}
 
+local function EnsureCanUse(src)
+    if CanUseBoombox and not CanUseBoombox(src) then
+        TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.notAllowed)
+        return false
+    end
+    return true
+end
+
 function SufficientDistance(coords)
     local minDistance = true
     for k,v in pairs(Speakers) do
@@ -13,6 +21,10 @@ function SufficientDistance(coords)
 end
 
 RegisterNetEvent('gacha_boombox:server:Playsong', function(data)
+    local src = source
+    if not EnsureCanUse(src) then
+        return
+    end
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
         local songId = GetSongInfo(data.playlist, data.url)
@@ -29,6 +41,10 @@ RegisterNetEvent('gacha_boombox:server:Playsong', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:SyncNewVolume', function(data)
+    local src = source
+    if not EnsureCanUse(src) then
+        return
+    end
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
         v.volume = data.volume
@@ -37,6 +53,10 @@ RegisterNetEvent('gacha_boombox:server:SyncNewVolume', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:SyncNewDist', function(data)
+    local src = source
+    if not EnsureCanUse(src) then
+        return
+    end
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
         if data.dist > 50 then
@@ -51,6 +71,9 @@ end)
 
 RegisterNetEvent('gacha_boombox:server:deleteBoombox', function(id, x)
     local src = source
+    if not EnsureCanUse(src) then
+        return
+    end
     if Speakers[id] and Speakers[id].coords and Speakers[id].coords.x and Speakers[id].coords.x == x and not Speakers[id].permaDisabled then
         Speakers[id].permaDisabled = true
         Speakers[id].playlistPLaying = {}
@@ -221,6 +244,10 @@ RegisterNetEvent('gacha_boombox:server:deleteSongPlaylist', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:nextSong', function(data)
+    local src = source
+    if not EnsureCanUse(src) then
+        return
+    end
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
         local songId = GetSongInfo(v.playlistPLaying, v.url)
@@ -249,6 +276,10 @@ RegisterNetEvent('gacha_boombox:server:nextSong', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:prevSong', function(data)
+    local src = source
+    if not EnsureCanUse(src) then
+        return
+    end
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
         local songId = GetSongInfo(v.playlistPLaying, v.url)
@@ -277,6 +308,10 @@ RegisterNetEvent('gacha_boombox:server:prevSong', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:syncNewTime', function(data)
+    local src = source
+    if not EnsureCanUse(src) then
+        return
+    end
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
         v.time = data.time
@@ -285,6 +320,10 @@ RegisterNetEvent('gacha_boombox:server:syncNewTime', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:pauseSong', function(data)
+    local src = source
+    if not EnsureCanUse(src) then
+        return
+    end
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
         if not v.paused then
@@ -329,6 +368,10 @@ end)
 
 CreateCallback("gacha_boombox:callback:canMove", function(source, cb, id)
     local src = source
+    if not EnsureCanUse(src) then
+        cb(false)
+        return
+    end
     if not Speakers[id].isMoving then
         Speakers[id].isMoving = true
         Speakers[id].playerMoving = src
@@ -343,6 +386,9 @@ end)
 
 RegisterNetEvent('gacha_boombox:server:updateObjectCoords', function(id)
     local src = source
+    if not EnsureCanUse(src) then
+        return
+    end
     if Speakers[id].isMoving and Speakers[id].playerMoving == src then
         local coords = GetEntityCoords(GetPlayerPed(src))
         local obj = CreateObject('prop_boombox_01', coords - vector3(0.0, 0.0, 1.0), true, false, true)
