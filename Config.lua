@@ -5,6 +5,7 @@ Config.fixSpeakersCommand = "fixSpeakers" --If speakers dont load use this comma
 Config.itemName = 'speaker' --You need to had this item created in your config or database
 Config.JobAccess = { police = 4, ambulance = 4 } --Job name and minimum grade required to place speakers
 Config.timeZone = "Europe/Madrid" --IMPORTANT to set what time zone is your server in
+Config.BoomboxControlDistance = 15 -- Max distance to control an existing speaker
 Config.KeyAccessUi = 38
 Config.KeyDeleteSpeaker = 194
 Config.KeyToMove = 311

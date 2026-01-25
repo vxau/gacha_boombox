@@ -40,6 +40,10 @@ local function HasSpeakerAccess(src)
     return false
 end
 
+function CanUseBoombox(src)
+    return HasSpeakerAccess(src)
+end
+
 function DeleteItem(src)
     if Config.framework == 'qbcore' then
         local Player = QBCore.Functions.GetPlayer(src)
