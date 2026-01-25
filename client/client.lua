@@ -6,8 +6,6 @@ local movingASpeaker = false
 local movingObject = 0
 local movingSpeakerId = -1
 local gangAnim = true
-local lastNuiUpdateMs = 0
-local nuiUpdateIntervalMs = 150
 
 function SendReactMessage(action, data)
     SendNUIMessage({
@@ -153,8 +151,6 @@ end
 Citizen.CreateThread(function()
     while true do
         local sleep = 500
-        local nowMs = GetGameTimer()
-        local canSendNui = (nowMs - lastNuiUpdateMs) >= nuiUpdateIntervalMs
         local player = PlayerPedId()
         local playerCoords = GetEntityCoords(player)
         for k,v in pairs(speakers) do
@@ -163,29 +159,15 @@ Citizen.CreateThread(function()
                 sleep = 100
             end
             if distance < v.maxDistance and not v.permaDisabled then
-                sleep = math.min(sleep, nuiUpdateIntervalMs)
-                if not v.isPlaying and v.url ~= '' and not v.paused and canSendNui then
-                    if v.lastSentPlaySongUrl ~= v.url or v.lastSentPlaySongTime ~= v.time or v.lastSentPlaySongVolume ~= v.volume then
-                        SendReactMessage('playSong', {repro = tonumber(k - 1), url = v.url, volume = v.volume, time = v.time})
-                        v.lastSentPlaySongUrl = v.url
-                        v.lastSentPlaySongTime = v.time
-                        v.lastSentPlaySongVolume = v.volume
-                        lastNuiUpdateMs = nowMs
-                        canSendNui = false
-                    end
+                sleep = 5
+                if not v.isPlaying and v.url ~= '' and not v.paused then
+                    SendReactMessage('playSong', {repro = tonumber(k - 1), url = v.url, volume = v.volume, time = v.time})
                     v.isPlaying = true
                 end
-                if canSendNui then
-                    local targetVolume = 0
-                    if not v.paused then
-                        targetVolume = tonumber(v.volume - (distance * v.volume / v.maxDistance))
-                    end
-                    if v.lastSentVolume ~= targetVolume then
-                        SendReactMessage('changeVolume', {repro = tonumber(k - 1), volume = targetVolume})
-                        v.lastSentVolume = targetVolume
-                        lastNuiUpdateMs = nowMs
-                        canSendNui = false
-                    end
+                if not v.paused then
+                    SendReactMessage('changeVolume', {repro = tonumber(k - 1), volume = tonumber(v.volume - (distance * v.volume / v.maxDistance))})
+                else
+                    SendReactMessage('changeVolume', {repro = tonumber(k - 1), volume = 0})
                 end
                 if distance < 1.5 and not v.isMoving then
                     if not movingASpeaker then
@@ -231,10 +213,6 @@ Citizen.CreateThread(function()
                 if v.isPlaying then
                     SendReactMessage('stopSong', tonumber(k - 1))
                     v.isPlaying = false
-                    v.lastSentPlaySongUrl = nil
-                    v.lastSentPlaySongTime = nil
-                    v.lastSentPlaySongVolume = nil
-                    v.lastSentVolume = nil
                 end
             end
             if v.isMoving then
