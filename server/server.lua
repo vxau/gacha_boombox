@@ -1,30 +1,6 @@
 Speakers = {}
 local objects = {}
 
-local function EnsureCanUseBoombox(src)
-    if CanUseBoombox and CanUseBoombox(src) then
-        return true
-    end
-
-    TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.noAccess)
-    return false
-end
-
-local function EnsureNearbyBoombox(src, speaker)
-    if not speaker or not speaker.coords then
-        return false
-    end
-
-    local maxDistance = Config.BoomboxControlDistance or speaker.maxDistance or 15
-    local playerCoords = GetEntityCoords(GetPlayerPed(src))
-    if #(playerCoords - speaker.coords) > maxDistance then
-        TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.notEnoughDistance)
-        return false
-    end
-
-    return true
-end
-
 function SufficientDistance(coords)
     local minDistance = true
     for k,v in pairs(Speakers) do
@@ -37,16 +13,8 @@ function SufficientDistance(coords)
 end
 
 RegisterNetEvent('gacha_boombox:server:Playsong', function(data)
-    local src = source
-    if not EnsureCanUseBoombox(src) then
-        return
-    end
-
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
-        if not EnsureNearbyBoombox(src, v) then
-            return
-        end
         local songId = GetSongInfo(data.playlist, data.url)
         v.maxDuration = data.playlist.songs[songId].maxDuration
         v.url = data.url
@@ -61,32 +29,16 @@ RegisterNetEvent('gacha_boombox:server:Playsong', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:SyncNewVolume', function(data)
-    local src = source
-    if not EnsureCanUseBoombox(src) then
-        return
-    end
-
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
-        if not EnsureNearbyBoombox(src, v) then
-            return
-        end
         v.volume = data.volume
         TriggerClientEvent('gacha_boombox:client:updateVolume', -1, tonumber(data.repro + 1), v.volume)
     end
 end)
 
 RegisterNetEvent('gacha_boombox:server:SyncNewDist', function(data)
-    local src = source
-    if not EnsureCanUseBoombox(src) then
-        return
-    end
-
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
-        if not EnsureNearbyBoombox(src, v) then
-            return
-        end
         if data.dist > 50 then
             data.dist = 50
         elseif data.dist < 2 then
@@ -99,14 +51,6 @@ end)
 
 RegisterNetEvent('gacha_boombox:server:deleteBoombox', function(id, x)
     local src = source
-    if not EnsureCanUseBoombox(src) then
-        return
-    end
-
-    if Speakers[id] and not EnsureNearbyBoombox(src, Speakers[id]) then
-        return
-    end
-
     if Speakers[id] and Speakers[id].coords and Speakers[id].coords.x and Speakers[id].coords.x == x and not Speakers[id].permaDisabled then
         Speakers[id].permaDisabled = true
         Speakers[id].playlistPLaying = {}
@@ -217,10 +161,6 @@ end)
 
 RegisterNetEvent('gacha_boombox:server:addSong', function(data)
     local src = source
-    if not EnsureCanUseBoombox(src) then
-        return
-    end
-
     MySQL.Async.fetchAll("SELECT id FROM gacha_songs WHERE url = @url", {['@url'] = data.url}, function(results)
         if results[1] and results[1].id then
             local idSongInPlaylist = MySQL.insert.await('INSERT INTO gacha_playlist_songs (playlist, song) VALUES (?, ?)', {
@@ -246,10 +186,6 @@ end)
 
 RegisterNetEvent('gacha_boombox:server:deletePlayList', function(data)
     local src = source
-    if not EnsureCanUseBoombox(src) then
-        return
-    end
-
     local license = GetPlayerIdentifierByType(src, 'license')
     MySQL.query('DELETE FROM gacha_playlists_users WHERE playlist = ? and license = ?', { data, license }, function()
         TriggerClientEvent('gacha_boombox:client:resyncPlaylists', src)
@@ -258,10 +194,6 @@ end)
 
 RegisterNetEvent('gacha_boombox:server:importNewPlaylist', function(data)
     local src = source
-    if not EnsureCanUseBoombox(src) then
-        return
-    end
-
     local license = GetPlayerIdentifierByType(src, 'license')
     MySQL.Async.fetchAll("SELECT id FROM gacha_playlists_users WHERE playlist = @playlist and license = @license", {['@playlist'] = tonumber(data), ['@license'] = license}, function(results)
         if #results < 1 then
@@ -278,10 +210,6 @@ end)
 
 RegisterNetEvent('gacha_boombox:server:deleteSongPlaylist', function(data)
     local src = source
-    if not EnsureCanUseBoombox(src) then
-        return
-    end
-
     local license = GetPlayerIdentifierByType(src, 'license')
     MySQL.Async.fetchAll("SELECT owner FROM gacha_playlists WHERE id = @playlist", {['@playlist'] = tonumber(data.playlist)}, function(results)
         if results[1].owner == license then
@@ -293,16 +221,8 @@ RegisterNetEvent('gacha_boombox:server:deleteSongPlaylist', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:nextSong', function(data)
-    local src = source
-    if not EnsureCanUseBoombox(src) then
-        return
-    end
-
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
-        if not EnsureNearbyBoombox(src, v) then
-            return
-        end
         local songId = GetSongInfo(v.playlistPLaying, v.url)
         if v.playlistPLaying.songs[songId + 1] then
             songId = songId + 1
@@ -329,16 +249,8 @@ RegisterNetEvent('gacha_boombox:server:nextSong', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:prevSong', function(data)
-    local src = source
-    if not EnsureCanUseBoombox(src) then
-        return
-    end
-
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
-        if not EnsureNearbyBoombox(src, v) then
-            return
-        end
         local songId = GetSongInfo(v.playlistPLaying, v.url)
         if v.playlistPLaying.songs[songId - 1] then
             songId = songId - 1
@@ -365,32 +277,16 @@ RegisterNetEvent('gacha_boombox:server:prevSong', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:syncNewTime', function(data)
-    local src = source
-    if not EnsureCanUseBoombox(src) then
-        return
-    end
-
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
-        if not EnsureNearbyBoombox(src, v) then
-            return
-        end
         v.time = data.time
         TriggerClientEvent('gacha_boombox:client:updateBoombox', -1, tonumber(data.repro + 1), v)
     end
 end)
 
 RegisterNetEvent('gacha_boombox:server:pauseSong', function(data)
-    local src = source
-    if not EnsureCanUseBoombox(src) then
-        return
-    end
-
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
-        if not EnsureNearbyBoombox(src, v) then
-            return
-        end
         if not v.paused then
             v.paused = true
             v.pausedTime = data.value
