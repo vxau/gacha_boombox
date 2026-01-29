@@ -174,15 +174,20 @@ Citizen.CreateThread(function()
                         ShowHelpNotification(Config.Translations.helpNotify)
                     end
                     if IsControlJustPressed(1, Config.KeyAccessUi)  and not movingASpeaker then
-                        SendReactMessage('setRepro', tonumber(k - 1))
-                        if not playlistsLoaded then
-                            SendReactMessage('getPlaylists')
-                        end
-                        if v.playlistPLaying.songs and v.playlistPLaying.songs[v.songId] then
-                            SendReactMessage('sendSongInfo', {author = v.playlistPLaying.songs[v.songId].author, name = v.playlistPLaying.songs[v.songId].name, url = v.url, volume = v.volume, dist = v.maxDistance, maxDuration = v.maxDuration, paused = v.paused, pausedTime = v.pausedTime})
-                        end
-                        toggleNuiFrame(true)
-                        reproInUi = k - 1
+                        TriggerCallback('gacha_boombox:callback:canUse', function(canUse)
+                            if not canUse then
+                                return
+                            end
+                            SendReactMessage('setRepro', tonumber(k - 1))
+                            if not playlistsLoaded then
+                                SendReactMessage('getPlaylists')
+                            end
+                            if v.playlistPLaying.songs and v.playlistPLaying.songs[v.songId] then
+                                SendReactMessage('sendSongInfo', {author = v.playlistPLaying.songs[v.songId].author, name = v.playlistPLaying.songs[v.songId].name, url = v.url, volume = v.volume, dist = v.maxDistance, maxDuration = v.maxDuration, paused = v.paused, pausedTime = v.pausedTime})
+                            end
+                            toggleNuiFrame(true)
+                            reproInUi = k - 1
+                        end)
                     end
                     if IsControlJustPressed(1, Config.KeyDeleteSpeaker) and not isInUI and not movingASpeaker then
                         TriggerServerEvent('gacha_boombox:server:deleteBoombox', k, v.coords.x)
