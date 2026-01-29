@@ -4,42 +4,6 @@ elseif Config.framework == 'custom' then
 	--Import your framework
 end
 
-local function HasSpeakerAccess(src)
-    if Config.framework == 'qbcore' then
-        local Player = QBCore.Functions.GetPlayer(src)
-        if not Player then
-            return false
-        end
-
-        local jobName = Player.PlayerData.job.name
-        local jobGrade = Player.PlayerData.job.grade.level
-        return Config.JobAccess
-            and Config.JobAccess[jobName]
-            and jobGrade >= Config.JobAccess[jobName]
-    elseif Config.framework == 'esx' then
-        if not ESX then
-            print('You need to import ESX in fxmanifest')
-            return false
-        end
-
-        local xPlayer = ESX.GetPlayerFromId(src)
-        if not xPlayer then
-            return false
-        end
-
-        local jobName = xPlayer.job.name
-        local jobGrade = xPlayer.job.grade
-        return Config.JobAccess
-            and Config.JobAccess[jobName]
-            and jobGrade >= Config.JobAccess[jobName]
-    elseif Config.framework == 'custom' then
-        --Import your access function
-        return true
-    end
-
-    return false
-end
-
 function DeleteItem(src)
     if Config.framework == 'qbcore' then
         local Player = QBCore.Functions.GetPlayer(src)
@@ -76,21 +40,13 @@ if Config.useItem then
     if Config.framework == 'qbcore' then
         QBCore.Functions.CreateUseableItem(Config.itemName, function(source)
             local src = source
-            if HasSpeakerAccess(src) then
-                CreateSpeaker(src)
-            else
-                TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.noAccess)
-            end
+            CreateSpeaker(src)
         end)
     elseif Config.framework == 'esx' then
         if ESX then
             ESX.RegisterUsableItem(Config.itemName, function(playerId)
                 local src = playerId
-                if HasSpeakerAccess(src) then
-                    CreateSpeaker(src)
-                else
-                    TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.noAccess)
-                end
+                CreateSpeaker(src)
             end)
         else
             print('You need to import ESX  in fxmanifest')
@@ -101,10 +57,6 @@ if Config.useItem then
 else
     RegisterCommand('createSpeaker', function(source)
         local src = source
-        if HasSpeakerAccess(src) then
-            CreateSpeaker(src)
-        else
-            TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.noAccess)
-        end
+        CreateSpeaker(src)
     end)
 end

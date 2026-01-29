@@ -11,8 +11,6 @@
 - **Using Items**:  
   - **If the option `useItem` is activated** in the configuration, you need to **create the item in your framework (either in the Config file or in the database)**. Once the item is created, you can use it to create a boombox.
   - **If the option `useItem` is not activated**, you can use the command `/createSpeaker` to create a boombox directly.
-- **Job Access Control**:  
-  Configure `Config.JobAccess` with job names and minimum grades to restrict who can place speakers. Players without access will see the `Config.Translations.noAccess` message.
 
 - **Need Help?**  
   If you need further assistance, join the community Discord: [https://discord.com/invite/GarJqg77aC](https://discord.com/invite/GarJqg77aC)
