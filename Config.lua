@@ -10,6 +10,10 @@ Config.KeyToMove = 311
 Config.KeyToPlaceSpeaker = 191
 Config.KeyToChangeAnim = 311
 
+Config.AllowedJobs = {
+    { job = 'realestate', minGrade = 4 }
+}
+
 Config.Translations = {
     notEnoughDistance= '近くのスピーカーともう少し距離を置いてください。',
     helpNotify= 'スピーカーにアクセスするには ~INPUT_CONTEXT~ を押し、削除するには ~INPUT_FRONTEND_RRIGHT~ を押し、ラジカセを持つには ~INPUT_REPLAY_SHOWHOTKEY~ を押してください。',
@@ -23,5 +27,6 @@ Config.Translations = {
     unkown= '不明',
     titleFirstMessage= 'まだプレイリストがありませんか？',
     secondFirstMessage= 'プレイリストを作成',
-    holdingBoombox= 'スピーカーを設置するには ~INPUT_FRONTEND_RDOWN~ を押し、アニメーションを変更するには ~INPUT_REPLAY_SHOWHOTKEY~ を押してください。'
+    holdingBoombox= 'スピーカーを設置するには ~INPUT_FRONTEND_RDOWN~ を押し、アニメーションを変更するには ~INPUT_REPLAY_SHOWHOTKEY~ を押してください。',
+    noPermission= 'BoomBOXを使用する権限がありません。'
 }

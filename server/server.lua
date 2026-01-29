@@ -1,6 +1,43 @@
 Speakers = {}
 local objects = {}
 
+function CanUseBoombox(src)
+    local allowedJobs = Config.AllowedJobs or {}
+    if #allowedJobs == 0 then
+        return true
+    end
+
+    local jobName = nil
+    local jobGrade = 0
+    if Config.framework == 'qbcore' then
+        local Player = QBCore.Functions.GetPlayer(src)
+        if not Player or not Player.PlayerData or not Player.PlayerData.job then
+            return false
+        end
+        jobName = Player.PlayerData.job.name
+        jobGrade = Player.PlayerData.job.grade and Player.PlayerData.job.grade.level or 0
+    elseif Config.framework == 'esx' then
+        if not ESX then
+            return false
+        end
+        local xPlayer = ESX.GetPlayerFromId(src)
+        if not xPlayer or not xPlayer.job then
+            return false
+        end
+        jobName = xPlayer.job.name
+        jobGrade = xPlayer.job.grade or 0
+    else
+        return true
+    end
+
+    for _, jobData in ipairs(allowedJobs) do
+        if jobData.job == jobName and jobGrade >= (jobData.minGrade or 0) then
+            return true
+        end
+    end
+    return false
+end
+
 function SufficientDistance(coords)
     local minDistance = true
     for k,v in pairs(Speakers) do
@@ -13,6 +50,11 @@ function SufficientDistance(coords)
 end
 
 RegisterNetEvent('gacha_boombox:server:Playsong', function(data)
+    local src = source
+    if not CanUseBoombox(src) then
+        TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.noPermission)
+        return
+    end
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
         local songId = GetSongInfo(data.playlist, data.url)
@@ -29,6 +71,11 @@ RegisterNetEvent('gacha_boombox:server:Playsong', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:SyncNewVolume', function(data)
+    local src = source
+    if not CanUseBoombox(src) then
+        TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.noPermission)
+        return
+    end
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
         v.volume = data.volume
@@ -37,6 +84,11 @@ RegisterNetEvent('gacha_boombox:server:SyncNewVolume', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:SyncNewDist', function(data)
+    local src = source
+    if not CanUseBoombox(src) then
+        TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.noPermission)
+        return
+    end
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
         if data.dist > 50 then
@@ -51,6 +103,10 @@ end)
 
 RegisterNetEvent('gacha_boombox:server:deleteBoombox', function(id, x)
     local src = source
+    if not CanUseBoombox(src) then
+        TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.noPermission)
+        return
+    end
     if Speakers[id] and Speakers[id].coords and Speakers[id].coords.x and Speakers[id].coords.x == x and not Speakers[id].permaDisabled then
         Speakers[id].permaDisabled = true
         Speakers[id].playlistPLaying = {}
@@ -113,6 +169,15 @@ end)
 
 CreateCallback("gacha_boombox:callback:getBoomboxs", function(source, cb)
 	cb(Speakers)
+end)
+
+CreateCallback("gacha_boombox:callback:canUse", function(source, cb)
+    if not CanUseBoombox(source) then
+        TriggerClientEvent('gacha_boombox:client:notify', source, Config.Translations.noPermission)
+        cb(false)
+        return
+    end
+    cb(true)
 end)
 
 function ExistPlaylist(playlists, playlistId)
@@ -221,6 +286,11 @@ RegisterNetEvent('gacha_boombox:server:deleteSongPlaylist', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:nextSong', function(data)
+    local src = source
+    if not CanUseBoombox(src) then
+        TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.noPermission)
+        return
+    end
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
         local songId = GetSongInfo(v.playlistPLaying, v.url)
@@ -249,6 +319,11 @@ RegisterNetEvent('gacha_boombox:server:nextSong', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:prevSong', function(data)
+    local src = source
+    if not CanUseBoombox(src) then
+        TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.noPermission)
+        return
+    end
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
         local songId = GetSongInfo(v.playlistPLaying, v.url)
@@ -277,6 +352,11 @@ RegisterNetEvent('gacha_boombox:server:prevSong', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:syncNewTime', function(data)
+    local src = source
+    if not CanUseBoombox(src) then
+        TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.noPermission)
+        return
+    end
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
         v.time = data.time
@@ -285,6 +365,11 @@ RegisterNetEvent('gacha_boombox:server:syncNewTime', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:server:pauseSong', function(data)
+    local src = source
+    if not CanUseBoombox(src) then
+        TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.noPermission)
+        return
+    end
     if data and data.repro and tonumber(data.repro) and Speakers[tonumber(data.repro + 1)] then
         local v = Speakers[tonumber(data.repro + 1)]
         if not v.paused then
@@ -299,6 +384,10 @@ RegisterNetEvent('gacha_boombox:server:pauseSong', function(data)
 end)
 
 function CreateSpeaker(src)
+    if not CanUseBoombox(src) then
+        TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.noPermission)
+        return
+    end
     local enoughDistance = SufficientDistance(GetEntityCoords(GetPlayerPed(src)))
     if enoughDistance then
         local data = {volume = 50, url = '', coords = GetEntityCoords(GetPlayerPed(src)), playlistPLaying = {}, time = 0, maxDistance = 15, isPlaying = false, maxDuration = 5000000, songId = -2, permaDisabled = false, paused = false, pausedTime = 0, isMoving = false, playerMoving = -2}
@@ -329,6 +418,11 @@ end)
 
 CreateCallback("gacha_boombox:callback:canMove", function(source, cb, id)
     local src = source
+    if not CanUseBoombox(src) then
+        TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.noPermission)
+        cb(false)
+        return
+    end
     if not Speakers[id].isMoving then
         Speakers[id].isMoving = true
         Speakers[id].playerMoving = src
@@ -343,6 +437,10 @@ end)
 
 RegisterNetEvent('gacha_boombox:server:updateObjectCoords', function(id)
     local src = source
+    if not CanUseBoombox(src) then
+        TriggerClientEvent('gacha_boombox:client:notify', src, Config.Translations.noPermission)
+        return
+    end
     if Speakers[id].isMoving and Speakers[id].playerMoving == src then
         local coords = GetEntityCoords(GetPlayerPed(src))
         local obj = CreateObject('prop_boombox_01', coords - vector3(0.0, 0.0, 1.0), true, false, true)
