@@ -11,7 +11,38 @@ Config.KeyToPlaceSpeaker = 191
 Config.KeyToChangeAnim = 311
 
 Config.AllowedJobs = {
-    { job = 'realestate', minGrade = 4 }
+    { job = 'taxi', minGrade = 4 },  
+    { job = 'cardealer',    minGrade = 4 }, 
+    { job = 'mechanic', minGrade = 3 },  
+    { job = 'mechanic2',    minGrade = 4 }, 
+    { job = 'mechanic3', minGrade = 4 },  
+    { job = 'mechanic4',    minGrade = 5 }, 
+    { job = 'mechanic5', minGrade = 5 },  
+    { job = 'bakery',    minGrade = 4 }, 
+    { job = 'unicorn', minGrade = 4 },  
+    { job = 'bahama',    minGrade = 4 }, 
+    { job = 'burgershot', minGrade = 4 },  
+    { job = 'uwu',    minGrade = 4 }, 
+    { job = 'bahama',    minGrade = 3 }, 
+    { job = 'tropical_heights', minGrade = 4 },  
+    { job = 'bakery',    minGrade = 4 }, 
+    { job = 'unicorn', minGrade = 4 },  
+    { job = 'bahama',    minGrade = 4 }, 
+    { job = 'ramen', minGrade = 3 },  
+    { job = 'vintage_cafe',    minGrade = 4 }, 
+    { job = 'mystic_spell',    minGrade = 3 }, 
+    { job = 'bath', minGrade = 4 },  
+    { job = 'cardealer',    minGrade = 2 }, 
+    { job = 'cake_shop', minGrade = 4 },  
+    { job = 'icecream',    minGrade = 4 }, 
+    { job = 'noir', minGrade = 4 },  
+    { job = 'pearl',    minGrade = 4 }, 
+    { job = 'luxxx_club', minGrade = 3 },  
+    { job = 'fusion',    minGrade = 4 }, 
+    { job = 'cigar_s',    minGrade = 3 }, 
+    { job = 'cigar_n', minGrade = 3 },  
+    { job = 'bayview_lodge', minGrade = 4 },
+    { job = 'dragons_beard', minGrade = 4 },
 }
 
 Config.Translations = {
