@@ -113,19 +113,14 @@ const App: React.FC = () => {
                 timeDifferenceInSeconds = Math.floor((timeMsec - data.time) / 1000);
             }
             const duration = repros[data.repro]?.playerRef?.current?.getDuration?.();
-            if (typeof duration === "number" && duration > 0) {
-                const clamped = Math.min(Math.max(timeDifferenceInSeconds, 0), duration - 1);
-                const next = [...repros];
-                next[data.repro] = { ...next[data.repro], url: data.url, volume: data.volume, time: clamped };
-                setRepros(next);
-                uR[data.repro].playerRef?.current?.seekTo(clamped, false);
-            } else {
-                const nextTime = timeDifferenceInSeconds < 0 ? 0 : timeDifferenceInSeconds;
-                const next = [...repros];
-                next[data.repro] = { ...next[data.repro], url: data.url, volume: data.volume, time: nextTime };
-                setRepros(next);
-                uR[data.repro].playerRef?.current?.seekTo(nextTime, false);
-            }
+            const nextTime = Math.max(timeDifferenceInSeconds, 0);
+            const clamped = typeof duration === "number" && duration > 0
+                ? Math.min(nextTime, duration - 1)
+                : nextTime;
+            const next = [...repros];
+            next[data.repro] = { ...next[data.repro], url: data.url, volume: data.volume, time: clamped };
+            setRepros(next);
+            uR[data.repro].playerRef?.current?.seekTo(clamped, false);
         }
     };
 
