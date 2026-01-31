@@ -114,9 +114,18 @@ const App: React.FC = () => {
             uR[data.repro].volume = data.volume;
             const timeMsec = new Date(new Date().toLocaleString('en-US', { timeZone: timeZone })).getTime();
             const timeDifferenceInSeconds = Math.floor((timeMsec - data.time) / 1000);
-            uR[data.repro].time = timeDifferenceInSeconds;
-            setRepros(uR);
-            uR[data.repro].playerRef?.current?.seekTo(timeDifferenceInSeconds, false);
+            const duration = repros[data.repro]?.playerRef?.current?.getDuration?.();
+            if (typeof duration === "number" && duration > 0) {
+                const clamped = Math.min(Math.max(timeDifferenceInSeconds, 0), duration - 1);
+                uR[data.repro].time = clamped;
+                setRepros(uR);
+                uR[data.repro].playerRef?.current?.seekTo(clamped, false);
+            } else {
+                const nextTime = timeDifferenceInSeconds < 0 ? 0 : timeDifferenceInSeconds;
+                uR[data.repro].time = nextTime;
+                setRepros(uR);
+                uR[data.repro].playerRef?.current?.seekTo(nextTime, false);
+            }
         }
     };
 
