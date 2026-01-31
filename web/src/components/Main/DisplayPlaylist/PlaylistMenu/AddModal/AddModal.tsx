@@ -16,18 +16,22 @@ export default function AddModal({opened, close, playlistActive}:Props) {
     //@ts-ignore
     const playerRef = useRef<YT.Player | null>(null);
     const AddSong = async () => {
-        const youtubeUrl = new URL(url);
-        if (youtubeUrl.hostname === 'www.youtube.com' || youtubeUrl.hostname === 'youtu.be') {
-          const videoIdRegex = /[?&]v=([^&]+)/;
-          const match = youtubeUrl.search.match(videoIdRegex);
-          let extractedVideoId = match ? match[1] : '';
-          if (extractedVideoId === '') {
-            extractedVideoId = youtubeUrl.pathname.split('/').pop() ?? '';
-          }
-          if (extractedVideoId !== '') {
-            setUrlT(extractedVideoId);
-            setIsAdded(true);
-          }
+        try {
+            const youtubeUrl = new URL(url);
+            if (youtubeUrl.hostname === 'www.youtube.com' || youtubeUrl.hostname === 'youtu.be') {
+              const videoIdRegex = /[?&]v=([^&]+)/;
+              const match = youtubeUrl.search.match(videoIdRegex);
+              let extractedVideoId = match ? match[1] : '';
+              if (extractedVideoId === '') {
+                extractedVideoId = youtubeUrl.pathname.split('/').pop() ?? '';
+              }
+              if (extractedVideoId !== '') {
+                setUrlT(extractedVideoId);
+                setIsAdded(true);
+              }
+            }
+        } catch (error) {
+            console.error('Invalid YouTube URL:', error);
         }
     };
 
@@ -84,29 +88,31 @@ export default function AddModal({opened, close, playlistActive}:Props) {
                     <button onClick={()=>{AddSong()}} className='addSongButton'>{addSongLabel}</button>
                 </div>
             </Input.Wrapper>
-            <div style={{display: 'none'}}>
-                <YouTube
-                    key={urlT}
-                    videoId={urlT}
-                    opts={{
-                        playerVars: {
-                            autoplay: 1,
-                            controls: 0,
-                            disablekb: 1,
-                            enablejsapi: 1,
-                            volume: 0,
-                            start: 0,
-                            quality: "small"
-                        },
-                    }}
-                    onReady={event => {
-                        playerRef.current = event.target;
-                        if (url !== '' && isAdded) {
-                            syncAddSong()
-                        }
-                    }}
-                />
-            </div>
+            {urlT ? (
+                <div style={{display: 'none'}}>
+                    <YouTube
+                        key={urlT}
+                        videoId={urlT}
+                        opts={{
+                            playerVars: {
+                                autoplay: 1,
+                                controls: 0,
+                                disablekb: 1,
+                                enablejsapi: 1,
+                                volume: 0,
+                                start: 0,
+                                quality: "small"
+                            },
+                        }}
+                        onReady={event => {
+                            playerRef.current = event.target;
+                            if (url !== '' && isAdded) {
+                                syncAddSong()
+                            }
+                        }}
+                    />
+                </div>
+            ) : null}
         </Modal>
     );
 }
