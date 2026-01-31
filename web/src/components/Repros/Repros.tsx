@@ -35,7 +35,7 @@ export default function Repros({ repros, setRepros }: ReprosProps) {
                                 //@ts-ignore
                                 updatedRepros[i].playerRef.current = event.target;
                                 updatedRepros[i].playerRef.current?.setVolume(val.volume);
-                                const startTime = updatedRepros[i].time;
+                                const startTime = Math.max(0, updatedRepros[i].time ?? 0);
                                 updatedRepros[i].playerRef.current?.seekTo(startTime, false);
                                 setRepros(updatedRepros);
                             }
