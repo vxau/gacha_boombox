@@ -29,7 +29,10 @@ export async function fetchNui<T = any>(eventName: string, data?: any, mockData?
     return Promise.resolve(undefined as T);
   }
 
-  const resourceName = (window as any).GetParentResourceName ? (window as any).GetParentResourceName() : 'nui-frame-app';
+  const resourceName = (window as any).GetParentResourceName?.();
+  if (!resourceName) {
+    return Promise.resolve(mockData as T);
+  }
 
   try {
     const resp = await fetch(`https://${resourceName}/${eventName}`, options);
@@ -37,7 +40,9 @@ export async function fetchNui<T = any>(eventName: string, data?: any, mockData?
 
     return respFormatted;
   } catch (error) {
-    console.error(`Failed to fetch NUI event "${eventName}".`, error);
+    if (import.meta.env?.DEV) {
+      console.error(`Failed to fetch NUI event "${eventName}".`, error);
+    }
     return undefined as T;
   }
 }
