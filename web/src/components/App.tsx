@@ -107,8 +107,11 @@ const App: React.FC = () => {
     const playSongB = (data: data) => {
         if (repros[data.repro]) {
             const uR = [...repros];
-            const timeMsec = new Date(new Date().toLocaleString('en-US', { timeZone: timeZone })).getTime();
-            const timeDifferenceInSeconds = Math.floor((timeMsec - data.time) / 1000);
+            let timeDifferenceInSeconds = 0;
+            if (timeZone) {
+                const timeMsec = new Date(new Date().toLocaleString('en-US', { timeZone: timeZone })).getTime();
+                timeDifferenceInSeconds = Math.floor((timeMsec - data.time) / 1000);
+            }
             const duration = repros[data.repro]?.playerRef?.current?.getDuration?.();
             if (typeof duration === "number" && duration > 0) {
                 const clamped = Math.min(Math.max(timeDifferenceInSeconds, 0), duration - 1);
