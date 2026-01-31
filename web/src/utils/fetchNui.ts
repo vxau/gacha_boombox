@@ -31,9 +31,13 @@ export async function fetchNui<T = any>(eventName: string, data?: any, mockData?
 
   const resourceName = (window as any).GetParentResourceName ? (window as any).GetParentResourceName() : 'nui-frame-app';
 
-  const resp = await fetch(`https://${resourceName}/${eventName}`, options);
+  try {
+    const resp = await fetch(`https://${resourceName}/${eventName}`, options);
+    const respFormatted = await resp.json();
 
-  const respFormatted = await resp.json()
-
-  return respFormatted
+    return respFormatted;
+  } catch (error) {
+    console.error(`Failed to fetch NUI event "${eventName}".`, error);
+    return undefined as T;
+  }
 }
