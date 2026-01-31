@@ -22,7 +22,6 @@ export default function Repros({ repros, setRepros }: ReprosProps) {
                                 disablekb: 1,
                                 enablejsapi: 1,
                                 volume: val.volume,
-                                start: val.time,
                                 quality: "small"
                             },
                         }}
@@ -36,7 +35,8 @@ export default function Repros({ repros, setRepros }: ReprosProps) {
                                 //@ts-ignore
                                 updatedRepros[i].playerRef.current = event.target;
                                 updatedRepros[i].playerRef.current?.setVolume(val.volume);
-                                updatedRepros[i].playerRef.current?.seekTo(val.time, false)
+                                const startTime = updatedRepros[i].time;
+                                updatedRepros[i].playerRef.current?.seekTo(startTime, false);
                                 setRepros(updatedRepros);
                             }
                         }}
