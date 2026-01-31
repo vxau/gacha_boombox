@@ -106,6 +106,7 @@ const App: React.FC = () => {
 
     const playSongB = (data: data) => {
         if (repros[data.repro]) {
+            const uR = [...repros];
             let timeDifferenceInSeconds = 0;
             if (timeZone) {
                 const timeMsec = new Date(new Date().toLocaleString('en-US', { timeZone: timeZone })).getTime();
@@ -119,6 +120,7 @@ const App: React.FC = () => {
             const next = [...repros];
             next[data.repro] = { ...next[data.repro], url: data.url, volume: data.volume, time: clamped };
             setRepros(next);
+            uR[data.repro].playerRef?.current?.seekTo(clamped, false);
         }
     };
 
