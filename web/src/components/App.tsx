@@ -105,25 +105,22 @@ const App: React.FC = () => {
     };
 
     const playSongB = (data: data) => {
-        const updatedRepros = [...repros];
-        if (updatedRepros[data.repro]) {
-            updatedRepros[data.repro].url = '';
-            setRepros(updatedRepros);
+        if (repros[data.repro]) {
             const uR = [...repros];
-            uR[data.repro].url = data.url;
-            uR[data.repro].volume = data.volume;
             const timeMsec = new Date(new Date().toLocaleString('en-US', { timeZone: timeZone })).getTime();
             const timeDifferenceInSeconds = Math.floor((timeMsec - data.time) / 1000);
             const duration = repros[data.repro]?.playerRef?.current?.getDuration?.();
             if (typeof duration === "number" && duration > 0) {
                 const clamped = Math.min(Math.max(timeDifferenceInSeconds, 0), duration - 1);
-                uR[data.repro].time = clamped;
-                setRepros(uR);
+                const next = [...repros];
+                next[data.repro] = { ...next[data.repro], url: data.url, volume: data.volume, time: clamped };
+                setRepros(next);
                 uR[data.repro].playerRef?.current?.seekTo(clamped, false);
             } else {
                 const nextTime = timeDifferenceInSeconds < 0 ? 0 : timeDifferenceInSeconds;
-                uR[data.repro].time = nextTime;
-                setRepros(uR);
+                const next = [...repros];
+                next[data.repro] = { ...next[data.repro], url: data.url, volume: data.volume, time: nextTime };
+                setRepros(next);
                 uR[data.repro].playerRef?.current?.seekTo(nextTime, false);
             }
         }
