@@ -21,7 +21,13 @@ export async function fetchNui<T = any>(eventName: string, data?: any, mockData?
     body: JSON.stringify(data),
   };
 
-  if (isEnvBrowser() && mockData) return mockData;
+  if (isEnvBrowser()) {
+    if (mockData !== undefined) {
+      return Promise.resolve(mockData);
+    }
+
+    return Promise.resolve(undefined as T);
+  }
 
   const resourceName = (window as any).GetParentResourceName ? (window as any).GetParentResourceName() : 'nui-frame-app';
 
