@@ -111,6 +111,11 @@ const App: React.FC = () => {
             if (timeZone) {
                 const timeMsec = new Date(new Date().toLocaleString('en-US', { timeZone: timeZone })).getTime();
                 timeDifferenceInSeconds = Math.floor((timeMsec - data.time) / 1000);
+            } else {
+                timeDifferenceInSeconds = 0;
+            }
+            if (timeDifferenceInSeconds < 0) {
+                timeDifferenceInSeconds = 0;
             }
             const duration = repros[data.repro]?.playerRef?.current?.getDuration?.();
             const nextTime = Math.max(timeDifferenceInSeconds, 0);
