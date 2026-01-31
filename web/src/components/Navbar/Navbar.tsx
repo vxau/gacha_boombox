@@ -55,24 +55,18 @@ export default function Navbar({author, name, image, volumeReproActive, setVolum
     }
 
     const updateTime = () => {
-        if (
-            repros[reproActive] &&
-            repros[reproActive]?.playerRef &&
-            repros[reproActive]?.playerRef?.current &&
-            repros[reproActive]?.playerRef?.current?.getCurrentTime &&
-            !paused
-        ) {
-            const currentTime = repros[reproActive]?.playerRef?.current?.getCurrentTime();
+    if (paused) {
+        setValue(pausedTime);
+        return;
+    }
 
-            if (typeof currentTime === 'number') {
-                setValue(currentTime);
-            }
-        }
+    const currentTime = repros[reproActive]?.playerRef?.current?.getCurrentTime?.();
 
-        if (paused) {
-            setValue(pausedTime);
-        }
+    if (typeof currentTime === "number") {
+        setValue(currentTime);
+    }
     };
+
 
     const pauseSong = () => {
         fetchNui('pauseSong', {repro: reproActive, value: repros[reproActive]?.playerRef?.current?.getCurrentTime(), time: new Date().getTime()})
