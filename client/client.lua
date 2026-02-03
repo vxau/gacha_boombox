@@ -78,7 +78,32 @@ RegisterNUICallback('importNewPlaylist', function(data)
 end)
 
 RegisterNetEvent('gacha_boombox:client:updateBoombox', function(id, data)
+    local previousSpeaker = speakers[id] or {}
+    local preservedIsPlaying = previousSpeaker.isPlaying or false
+    local preservedNuiIsPlaying = previousSpeaker.nuiIsPlaying or false
+    local shouldResetPlayback = false
+
+    if previousSpeaker.url and data.url and previousSpeaker.url ~= data.url then
+        shouldResetPlayback = true
+    end
+    if previousSpeaker.songId and data.songId and previousSpeaker.songId ~= data.songId then
+        shouldResetPlayback = true
+    end
+    if data.url == '' or data.url == nil then
+        shouldResetPlayback = true
+    end
+
     speakers[id] = data
+    speakers[id].isPlaying = preservedIsPlaying
+    speakers[id].nuiIsPlaying = preservedNuiIsPlaying
+
+    if shouldResetPlayback then
+        speakers[id].isPlaying = false
+        speakers[id].nuiIsPlaying = false
+        if preservedNuiIsPlaying then
+            SendReactMessage('stopSong', tonumber(id - 1))
+        end
+    end
     if (id - 1) == reproInUi then
         SendReactMessage('sendSongInfo', {author= speakers[id].playlistPLaying.songs[speakers[id].songId].author, name = speakers[id].playlistPLaying.songs[speakers[id].songId].name, url = speakers[id].url, volume = speakers[id].volume, dist = speakers[id].maxDistance, maxDuration = speakers[id].maxDuration, paused = speakers[id].paused, pausedTime = speakers[id].pausedTime})
     end
@@ -163,6 +188,7 @@ Citizen.CreateThread(function()
                 if not v.isPlaying and v.url ~= '' and not v.paused then
                     SendReactMessage('playSong', {repro = tonumber(k - 1), url = v.url, volume = v.volume, time = v.time})
                     v.isPlaying = true
+                    v.nuiIsPlaying = true
                 end
                 if not v.paused then
                     SendReactMessage('changeVolume', {repro = tonumber(k - 1), volume = tonumber(v.volume - (distance * v.volume / v.maxDistance))})
@@ -215,9 +241,10 @@ Citizen.CreateThread(function()
                     end
                 end
             else
-                if v.isPlaying then
+                if v.nuiIsPlaying then
                     SendReactMessage('stopSong', tonumber(k - 1))
                     v.isPlaying = false
+                    v.nuiIsPlaying = false
                 end
             end
             if v.isMoving then
