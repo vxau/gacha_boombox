@@ -96,7 +96,7 @@ const App: React.FC = () => {
 
     const createReproGlobal = (speakers: data[]) => {
         setRepros(speakers.map((speaker : data) => ({
-            url: speaker.url,
+            url: '',
             playerRef: createRef<YT.Player | null>(),
             volume: speaker.volume,
             time: speaker.time

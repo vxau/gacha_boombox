@@ -10,8 +10,12 @@ interface ReprosProps {
 export default function Repros({ repros, setRepros }: ReprosProps) {
     return (
         <div className='videoYoutube'>
-            {repros && repros.map((val, i) => (
-                val?.url ? (
+            {repros && repros.map((val, i) => {
+                if (!val?.url) {
+                    return null;
+                }
+
+                return (
                     <YouTube
                         key={`${val.url}-${i}`}
                         videoId={val.url}
@@ -41,8 +45,8 @@ export default function Repros({ repros, setRepros }: ReprosProps) {
                             }
                         }}
                     />
-                ) : null
-            ))}
+                );
+            })}
         </div>
     );
 }
